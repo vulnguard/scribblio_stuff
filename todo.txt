@@ -1,0 +1,12 @@
+make randomiser function interactive
+
+remove number from game titles if it gives it away; e.g. Dota 2
+
+remove: 
+vex
+evoker
+husk
+pillager
+ravager
+stray
+vindicator

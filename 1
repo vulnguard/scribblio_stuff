@@ -1,0 +1,136 @@
+import pprint
+import sys
+
+
+def main():
+    if len(sys.argv) > 1:
+        if sys.argv[1] == "--diff":
+            diff(sys.argv[2], sys.argv[3])
+            return
+
+    print("=" * 9 + " START " + "=" * 9)
+
+    pp = pprint.PrettyPrinter(indent=4)
+
+    word_file_name = "wordlist.txt"
+
+    word_list = get_words(word_file_name)
+
+    checked_words = manual_check_words(word_list)
+
+    pp.pprint(checked_words)
+
+    with open("output.txt", "w") as f:
+        string = ""
+        for word in checked_words:
+            string += word + ","
+
+        string = string[:-1]
+
+        f.write(string)
+
+
+    print("=" * 9 + " END " + "=" * 9)
+
+
+
+def manual_check_words(words):
+    checked_words = []
+
+    count = 0
+
+    while count < len(words):
+        word = words[count]
+
+        print(word + " {}/{}".format(count + 1, len(words)))
+
+        choice = input()
+
+        try:
+            i = int(choice)
+            isint = True
+        except Exception as e:
+            isint = False
+
+        # Do nothing
+        if choice == '':
+            print("No change")
+            checked_words.append(word)
+
+            count += 1
+
+        elif isint:
+            new_index = int(choice) - 1
+            if new_index >= len(words):
+                new_index = len(words) - 1
+
+            while count < new_index:
+                checked_words.append(word)
+                count += 1
+                word = words[count]
+
+        # Delete
+        elif choice == 'd':
+            print("Delete '{}', are you sure? (y/n)".format(word))
+            delete = input()
+            if delete == "y":
+                # Dont add the word to the new list
+                print("Deleted '{}'".format(word))
+            else:
+                print("No change")
+                checked_words.append(word)
+
+            count += 1
+
+        # Go back
+        elif choice == 'b':
+            count -= 1
+
+        # Modification
+        else:
+            print("Changing '{}' to '{}'\n".format(word, choice))
+            checked_words.append(choice)
+            count += 1
+
+
+    return checked_words
+
+
+def diff(file1, file2):
+    words1 = get_words(file1)
+    words2 = get_words(file2)
+
+    print("-" * 3 + "in {} but not {}".format(file1, file2) + "-" * 3)
+
+    for word in words1:
+        if not word in words2:
+            print(word)
+            
+    print("-" * 3 + "in {} but not {}".format(file2, file1) + "-" * 3)
+
+    for word in words2:
+        if not word in words1:
+            print(word)
+
+
+def get_words(filename):
+    words = open(filename, "r").read().split(",")
+
+    good_words = []
+
+    for word in words:
+        new_word = word.lstrip()
+
+        if word[0] == "\n":
+            new_word = word[1:].lstrip()
+
+        if word[-1] == " " or word[-1] == "\n":
+            new_word = word[:-1].lstrip()
+
+        if len(new_word) != 0:
+            good_words.append(new_word.lstrip())
+
+    return good_words
+
+if __name__ == "__main__":
+    main()
